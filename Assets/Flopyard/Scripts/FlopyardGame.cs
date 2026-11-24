@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using GameTouch;
 
 namespace Flopyard
 {
@@ -75,7 +76,16 @@ namespace Flopyard
                 .With("Up", "<Keyboard>/upArrow").With("Down", "<Keyboard>/downArrow").With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
             moveAction.AddBinding("<Gamepad>/leftStick");
             moveAction.Enable();
+
+            // phones: a stick on the left half, PUNCH and KICK on the right, usable at the same time
+            touch = TouchPad.Create(font, outlineMaterial);
+            touch.AddStick(new Rect(0, 0, 0.5f, 0.75f), new Vector2(0, 0), new Vector2(250, 330), 150);
+            punchBtn = touch.AddButton("PUNCH", new Vector2(1, 0), new Vector2(-200, 380), 130, new Color(1f, 0.78f, 0.25f), 46);
+            kickBtn = touch.AddButton("KICK", new Vector2(1, 0), new Vector2(-450, 230), 110, new Color(0.45f, 0.8f, 1f), 42);
         }
+
+        TouchPad touch;
+        TouchPad.Button punchBtn, kickBtn;
 
         void OnDestroy()
         {
@@ -203,6 +213,7 @@ namespace Flopyard
 
         void HeroControl(float dt)
         {
+            if (touch) touch.hidden = autoPlay;
             if (hero.knockedOut) { hero.moveInput = Vector3.zero; return; }
             var target = NearestEnemy(hero.Position, 12);
             hero.focus = target;
@@ -218,15 +229,18 @@ namespace Flopyard
             }
 
             Vector2 m = moveAction.ReadValue<Vector2>();
+            if (touch && touch.StickHeld) m = Vector2.ClampMagnitude(m + touch.Stick, 1f);
             Vector3 move = camFwd * m.y + camRight * m.x;
             hero.moveInput = Vector3.ClampMagnitude(move, 1);
             hero.wantsGetUp = m.sqrMagnitude > 0.04f;
             if (target) { var d = target.Position - hero.Position; d.y = 0; hero.faceDir = d.normalized; }
             else if (move.sqrMagnitude > 0.01f) hero.faceDir = move.normalized;
 
-            var kb = Keyboard.current; var mouse = Mouse.current; var pad = Gamepad.current;
+            var kb = Keyboard.current; var pad = Gamepad.current;
+            var mouse = TouchPad.RecentTouch ? null : Mouse.current; // ignore mouse clicks a browser emulates from taps
             bool punch = (mouse != null && mouse.leftButton.wasPressedThisFrame) || (kb != null && (kb.jKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)) || (pad != null && pad.buttonWest.wasPressedThisFrame);
             bool kick = (mouse != null && mouse.rightButton.wasPressedThisFrame) || (kb != null && kb.kKey.wasPressedThisFrame) || (pad != null && pad.buttonNorth.wasPressedThisFrame);
+            if (touch) { punch |= punchBtn.pressed; kick |= kickBtn.pressed; }
             if (punch) hero.Punch();
             if (kick) hero.Kick();
             if (kb != null && kb.rKey.wasPressedThisFrame) StartRun();
