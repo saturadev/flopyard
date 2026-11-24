@@ -1,5 +1,7 @@
 # Flopyard
 
+**[▶ Play in browser](https://saturaspace.com/play/brawl/)**
+
 A wobbly physics-ragdoll brawler in a sunny stone courtyard: walk up, swing punches and high kicks, and send floppy sparring opponents flying.
 
 <p align="center"><img src="media/gameplay.gif" width="360" alt="Flopyard gameplay"></p>
