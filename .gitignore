@@ -1,0 +1,42 @@
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Bb]uild*/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+*.csproj
+*.sln
+*.sln.*
+*.slnx
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vs/
+.vscode/
+.idea/
+.DS_Store
+
+# Satura Space and agent files (Satura Space adds these itself)
+/.sspace/
+/.mcp.json
+/.claude/
+/.cursor/
+CLAUDE.md
+AGENTS.md
+/Packages/com.saturaspace.*
+/Assets/csc.rsp
+/Assets/csc.rsp.meta
+/ProjectSettings/SaturaRemote/
+
+# The source clip, its frames and the comparison video belong to their creator
+/ClipToGame/
